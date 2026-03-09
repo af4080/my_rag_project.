@@ -1,36 +1,35 @@
 import os
 from dotenv import load_dotenv
 from llama_index.core import VectorStoreIndex, SimpleDirectoryReader, StorageContext
-from llama_index.vector_stores.pinecone import PineconeVectorStore
 from llama_index.embeddings.cohere import CohereEmbedding
-from pinecone import Pinecone
+
+# פתרון לנטפרי (SSL)
+import ssl
+import urllib3
+ssl._create_default_https_context = ssl._create_unverified_context
+urllib3.disable_warnings(urllib3.exceptions.InsecureRequestWarning)
 
 load_dotenv()
 
-# 1. התחברות ל-Pinecone
-pc = Pinecone(api_key=os.environ["PINECONE_API_KEY"])
-
-# ודאי שיצרת אינדקס בלוח הבקרה של Pinecone עם 1024 מימדים (Dimensions)
-pinecone_index = pc.Index("agentic-index") 
-
-# 2. הגדרת מודל ה-Embedding (המתרגם של הטקסט למספרים)
+# 1. הגדרת מודל ה-Embedding של Cohere
 embed_model = CohereEmbedding(
     model_name="embed-multilingual-v3.0", 
     api_key=os.environ["COHERE_API_KEY"]
 )
 
-# 3. טעינת המסמכים מהתיקייה שיצרנו
+# 2. טעינת המסמכים מהתיקייה
+print("טוען מסמכים...")
 documents = SimpleDirectoryReader("./mock_docs").load_data()
 
-# 4. חיבור ה-Vector Store של LlamaIndex ל-Pinecone
-vector_store = PineconeVectorStore(pinecone_index=pinecone_index)
-storage_context = StorageContext.from_defaults(vector_store=vector_store)
-
-# 5. יצירת האינדקס ושליחה לענן
+# 3. יצירת האינדקס בזיכרון (In-memory)
+print("יוצר אינדקס וקטורי (זה עשוי לקחת כמה שניות)...")
 index = VectorStoreIndex.from_documents(
     documents, 
-    storage_context=storage_context, 
     embed_model=embed_model
 )
 
-print("✅ המידע עלה ל-Pinecone בהצלחה!")
+# 4. שמירה פיזית לתיקייה מקומית בשם 'storage'
+# זה מחליף את Pinecone ושומר קבצי JSON במקום
+index.storage_context.persist(persist_dir="./storage")
+
+print("✅ המידע אונדקס ונשמר בהצלחה בתיקיית ./storage!")
