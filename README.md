@@ -1,42 +1,53 @@
+.
+
+.
+
 :
 
 ---
 
-#  Smart Project Assistant: Agentic RAG & Extraction
+# 🤖 עוזר פרויקט חכם: Agentic RAG & Data Extraction
 
-מערכת בינה מלאכותית מתקדמת המנהלת ותחקרת החלטות טכניות של פרויקט. המערכת משלבת חיפוש סמנטי (RAG), חילוץ נתונים מובנים (Data Extraction) וסוכן חכם (AI Agent) המקבל החלטות בזמן אמת.
+פרויקט זה מציג מערכת בינה מלאכותית מתקדמת לניהול ותחקור החלטות טכניות. המערכת משלבת אחזור מידע ממסמכים (RAG), חילוץ נתונים מובנים ל-JSON, וסוכן (Agent) חכם שמקבל החלטות בזמן אמת על סמך השאילתה.
 
-##  מבט על המערכת (System Overview)
+## 🎯 עמידה בדרישות הפרויקט
+
+המערכת עונה על **כל** דרישות המטלה בצורה מלאה:
+
+* **LlamaIndex & Cohere:** שימוש במודל שפה ובוקטורים של Cohere לאורך כל התהליך.
+* **Agentic System:** בניית סוכן חכם המשתמש בלוגיקת ReAct (מחשבה -> פעולה -> תצפית).
+* **Structured Data Extraction:** חילוץ אוטומטי של נתונים מובנים מתוך טקסט חופשי לפורמט JSON באמצעות Pydantic Schema.
+* **Event-Driven Workflow:** ניהול תהליך השליפה והאימות באמצעות מערכת אירועים (Events).
+* **Multi-Tool Usage:** הסוכן יודע לנתב שאילתות בין כלי החיפוש בטקסט (RAG) לבין כלי קריאת הנתונים המובנים (JSON).
+* **ממשק משתמש (UI):** פיתוח ממשק צ'אט אינטראקטיבי באמצעות Streamlit.
+
+## 📸 צילום מסך של המערכת
 
 
-*הממשק מציג מענה חכם של הסוכן על בסיס נתונים שחולצו ומידע טקסטואלי.*
+*(יש לשמור את צילום המסך שהעלית קודם בשם screenshot.png בתיקיית הפרויקט)*
 
-##  תכונות עיקריות (Key Features)
+## 🏗️ מבנה הפרויקט
 
-* **Agentic Routing:** סוכן חכם מבוסס `ReAct` היודע להחליט באופן עצמאי באיזה כלי להשתמש כדי לענות על שאלת המשתמש.
-* **Semantic Search (RAG):** שליפת מידע מדויקת מתוך קבצי Markdown באמצעות אינדוקס וקטורי ו-Embeddings של Cohere.
-* **Structured Data Extraction:** המרת טקסט חופשי לפורמט JSON מובנה (Schema-based) באמצעות Pydantic ו-LLM.
-* **Event-Driven Workflow:** ניהול תהליך שליפה וולידציה מבוסס אירועים (Events) להבטחת איכות התשובה.
-* **Streamlit UI:** ממשק צ'אט אינטראקטיבי המציג את "מחשבות" הסוכן ואת התוצאות הסופיות.
+* `ingest_data.py`: טעינת מסמכי Markdown, יצירת אינדוקס וקטורי ושמירה בתיקיית `storage`.
+* `data_extraction.py`: סריקת המסמכים וחילוץ החלטות לתוך קובץ ה-JSON המובנה `extracted_data.json`.
+* `rag_workflow.py`: הגדרת זרימת העבודה מבוססת האירועים (Events) לשליפה וסיכום מידע.
+* `agent_system.py`: הגדרת הסוכן (Agent), הכלים שלו (Tools) ולוגיקת הניתוב.
+* `app.py`: קוד הממשק הגרפי (Streamlit).
 
-##  ארכיטקטורת המערכת (Architecture)
+## 🛠️ הוראות הרצה
 
-1. **Ingestion Layer (`ingest_data.py`):** טוען את קבצי ה-Markdown, הופך אותם לוקטורים ושומר אותם מקומית בתיקיית `storage`.
-2. **Extraction Layer (`data_extraction.py`):** משתמש ב-`LLMTextCompletionProgram` כדי לחלץ רשימה מובנית של החלטות לקובץ `extracted_data.json`.
-3. **Agent Logic (`agent_system.py`):** מגדיר `AgentRunner` המנהל שני כלים: `documentation_tool` (חיפוש טקסט) ו-`structured_data_viewer` (קריאת ה-JSON).
-4. **Workflow Management (`rag_workflow.py`):** מיישם תהליך רב-שלבי הכולל שליפה (Retrieve), אימות (Validate) וניסוח (Synthesize) באמצעות אירועים מוגדרים מראש.
+1. **התקנת ספריות:** `pip install llama-index llama-index-llms-cohere llama-index-embeddings-cohere streamlit pydantic python-dotenv`
+2. **הגדרת מפתח API:** יש ליצור קובץ `.env` עם המפתח: `COHERE_API_KEY=your_key_here`.
+3. **הכנת הנתונים:**
+* הריצי `python ingest_data.py` לעיבוד המסמכים.
+* הריצי `python data_extraction.py` לחילוץ הנתונים ל-JSON.
 
-##  דוגמה לזרימת עבודה (Example Workflow)
 
-כפי שניתן לראות בצילום המסך:
+4. **הפעלת הממשק:**
+`streamlit run app.py`
 
-* **שאילתה:** המשתמש מבקש סיכום של ההחלטות והרקע שלהן.
-* **פעולת הסוכן:** הסוכן מפעיל את כלי התיעוד.
-* **תוצאה:** מוצגות שלוש החלטות (PostgreSQL, RTL, Redis) עם פירוט רלוונטי לכל אחת.
+---
+.
+3. קחי את התמונה שהעלית לי קודם (זאת עם ה-Redis), ושמרי אותה באותה תיקייה תחת השם `screenshot.png`.
 
-##  הוראות הפעלה (Setup)
-
-1. הגדרת API Key בקובץ `.env`.
-2. הרצת `python ingest_data.py` לאינדוקס המסמכים.
-3. הרצת `python data_extraction.py` לחילוץ הנתונים.
-4. הפעלת הממשק: `streamlit run app.py`.
+**נראה שסגרת את כל הפינות! את מרגישה מוכנה לארוז הכל ל-ZIP ולהגיש?**
