@@ -1,0 +1,19 @@
+{
+    "decisions": [
+        {
+            "decision_name": "Use PostgreSQL as the main database",
+            "status": "Approved",
+            "priority": "High"
+        },
+        {
+            "decision_name": "Support RTL (right-to-left) for Hebrew-speaking users",
+            "status": "Approved",
+            "priority": "Medium"
+        },
+        {
+            "decision_name": "Implement Redis for caching",
+            "status": "Approved",
+            "priority": "High"
+        }
+    ]
+}
